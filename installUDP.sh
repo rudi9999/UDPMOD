@@ -5,8 +5,12 @@
 # (c) 2023 Khaled AGN
 #
 
-set -e
+clear
+echo
+read -p ' INGRESA TU DOMINI: ' DOMAIN
+echo
 
+set -e
 
 ###
 # SCRIPT CONFIGURATION
@@ -17,10 +21,10 @@ set -e
 BINARY_URL="https://github.com/rudi9999/UDPMOD/raw/main/udpmod-"
 
 # Domain Name
-DOMAIN="tu dominio aqui"
+#DOMAIN="tu dominio aqui"
 
 # OBFS, CAPA EXTRA DE SIFRADO DE PUNTO A PUNTO
-OBFS="Rufu99"
+OBFS=$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 8)
 
 # =============================================================
 
@@ -934,6 +938,13 @@ perform_install() {
 							echo
 							echo -e "$(tbold)Client app AGN INJECTOR:$(treset)"
 							echo -e "$(tblue)https://play.google.com/store/apps/details?id=com.agn.injector$(treset)"
+							echo
+							echo " TU DOMINIO: $DOMAIN"
+							echo " SIFRADO OBFS: $OBFS"
+							echo
+							echo "crear usuario manualmente"
+							echo
+							echo "useradd -M -s /bin/false NOMBRE; (echo 'CONTRASEÑA'; echo 'CONTRASEÑA')|passwd NOMBRE"
 							echo
 							else
 								restart_running_services
