@@ -657,7 +657,7 @@ After=network.target
 User=root
 Group=root
 WorkingDirectory=/etc/udpmod
-Environment="PATH=/usr/local/bin/udpmod"
+Environment="PATH=/usr/local/bin/udpmod:/usr/bin"
 ExecStart=/usr/local/bin/udpmod -config /etc/udpmod/config.json server
 
 [Install]
