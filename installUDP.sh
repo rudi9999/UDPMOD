@@ -18,7 +18,7 @@ set -e
 
 # =============================================================
 
-BINARY_URL="https://github.com/rudi9999/UDPMOD/raw/main/udpmod-"
+BINARY_URL="https://github.com/rudi9999/UDPMOD/raw/main"
 
 # Domain Name
 #DOMAIN="tu dominio aqui"
@@ -59,7 +59,7 @@ CONFIG_DIR="/etc/udpmod"
 
 # URLs of GitHub
 REPO_URL="https://github.com/apernet/udpmod"
-API_BASE_URL="https://api.github.com/repos/apernet/udpmod"
+API_BASE_URL="$BINARY_URL"
 
 # curl command line flags.
 # To using a proxy, please specify ALL_PROXY in the environ variable, such like:
@@ -751,37 +751,37 @@ is_udpmod_installed() {
 	
 	if [[ -f "$EXECUTABLE_INSTALL_PATH" || -h "$EXECUTABLE_INSTALL_PATH" ]]; then
 		return 0
-		fi
+	fi
 		return 1
 }
 
 get_installed_version() {
 	if is_udpmod_installed; then
-		"$EXECUTABLE_INSTALL_PATH" -v | cut -d ' ' -f 3
-		fi
+		"$EXECUTABLE_INSTALL_PATH" -v | grep -v MOD | cut -d ' ' -f3|tr -d '\n'
+	fi
 }
 
 get_latest_version() {
 	if [[ -n "$VERSION" ]]; then
 		echo "$VERSION"
 		return
-		fi
+	fi
+	
+	local _tmpfile=$(mktemp)
+	if ! curl -sS -H 'Accept: application/vnd.github.v3+json' "$API_BASE_URL/version" -o "$_tmpfile"; then
+		error "Failed to get latest release, please check your network."
+		exit 11
+	fi
+			
+	local _latest_version=$(cat "$_tmpfile"|tr -d '\n')
+	_latest_version=${_latest_version#'"'}
+	_latest_version=${_latest_version%'"'}
+	
+	if [[ -n "$_latest_version" ]]; then
+		echo "$_latest_version"
+	fi
 		
-		local _tmpfile=$(mktemp)
-		if ! curl -sS -H 'Accept: application/vnd.github.v3+json' "$API_BASE_URL/releases/latest" -o "$_tmpfile"; then
-			error "Failed to get latest release, please check your network."
-			exit 11
-			fi
-			
-			local _latest_version=$(grep 'tag_name' "$_tmpfile" | head -1 | grep -o '"v.*"')
-			_latest_version=${_latest_version#'"'}
-			_latest_version=${_latest_version%'"'}
-			
-			if [[ -n "$_latest_version" ]]; then
-				echo "$_latest_version"
-				fi
-				
-				rm -f "$_tmpfile"
+	rm -rf "$_tmpfile"
 }
 
 download_udpmod() {
@@ -789,7 +789,7 @@ download_udpmod() {
 	local _destination="$2"
 	
 	#local _download_url="$REPO_URL/releases/download/$_version/udpmod-$OPERATING_SYSTEM-$ARCHITECTURE"
-	local _download_url="$BINARY_URL$ARCHITECTURE"
+	local _download_url="$BINARY_URL/udpmod-$ARCHITECTURE"
 	echo "Downloading udpmod archive: $_download_url ..."
 	if ! curl -R -H 'Cache-Control: no-cache' "$_download_url" -o "$_destination"; then
 		error "Download failed! Please check your network and try again."
@@ -807,26 +807,26 @@ check_update() {
 	local _installed_version="$(get_installed_version)"
 	if [[ -n "$_installed_version" ]]; then
 		echo "$_installed_version"
-		else
-			echo "not installed"
-			fi
+	else
+		echo "not installed"
+	fi
 			
-			echo -ne "Checking for latest version ... "
-			local _latest_version="$(get_latest_version)"
-			if [[ -n "$_latest_version" ]]; then
-				echo "$_latest_version"
-				VERSION="$_latest_version"
-				else
-					echo "failed"
-					return 1
-					fi
+	echo -ne "Checking for latest version ... "
+	local _latest_version="$(get_latest_version)"
+	if [[ -n "$_latest_version" ]]; then
+		echo "$_latest_version"
+		VERSION="$_latest_version"
+	else
+		echo "failed"
+		return 1
+	fi
 					
-					local _vercmp="$(vercmp "$_installed_version" "$_latest_version")"
-					if [[ "$_vercmp" -lt 0 ]]; then
-						return 0
-						fi
-						
-						return 1
+	local _vercmp="$(vercmp "$_installed_version" "$_latest_version")"
+	if [[ "$_vercmp" -lt 0 ]]; then
+		return 0
+	fi
+		
+	return 1
 }
 
 
@@ -903,56 +903,64 @@ perform_install_udpmod_home_legacy() {
 		fi
 }
 
+inicio(){
+	clear
+	echo
+	read -p ' INGRESA UN DOMINIO/HOST: ' DOMAIN
+	echo
+}
+
 perform_install() {
 	local _is_frash_install
 	if ! is_udpmod_installed; then
+		inicio
 		_is_frash_install=1
-		fi
+	fi
 		
-		local _is_update_required
+	local _is_update_required
 		
-		if [[ -n "$LOCAL_FILE" ]] || [[ -n "$VERSION" ]] || check_update; then
-			_is_update_required=1
-			fi
+	if [[ -n "$LOCAL_FILE" ]] || [[ -n "$VERSION" ]] || check_update; then
+		_is_update_required=1
+	fi
 			
-			if [[ "x$FORCE" == "x1" ]]; then
-				if [[ -z "$_is_update_required" ]]; then
-					note "Option '--force' is specified, re-install even if installed version is the latest."
-					fi
-					_is_update_required=1
-					fi
+	if [[ "x$FORCE" == "x1" ]]; then
+		if [[ -z "$_is_update_required" ]]; then
+			note "Option '--force' is specified, re-install even if installed version is the latest."
+		fi
+			_is_update_required=1
+	fi
 					
-					if [[ -z "$_is_update_required" ]]; then
-						echo "$(tgreen)Installed version is up-to-dated, there is nothing to do.$(treset)"
-						return
-						fi
-						perform_install_udpmod_binary
-						perform_install_udpmod_example_config
-						perform_install_udpmod_home_legacy
-						perform_install_udpmod_systemd
-						setup_ssl
-					        start_services
-						if [[ -n "$_is_frash_install" ]]; then
-							echo
-							echo -e "$(tbold)Congratulation! Rufu99-UDP has been successfully installed on your server.$(treset)"
-							echo
-							echo -e "$(tbold)Client app AGN INJECTOR:$(treset)"
-							echo -e "$(tblue)https://play.google.com/store/apps/details?id=com.agn.injector$(treset)"
-							echo
-							echo " TU DOMINIO: $DOMAIN"
-							echo " SIFRADO OBFS: $OBFS"
-							echo
-							echo "crear usuario manualmente"
-							echo
-							echo "useradd -M -s /bin/false NOMBRE; (echo 'CONTRASEÑA'; echo 'CONTRASEÑA')|passwd NOMBRE"
-							echo
-							else
-								restart_running_services
-								
-								echo
-								echo -e "$(tbold)Rufu99-UDP has been successfully update to $VERSION.$(treset)"
-								echo
-								fi
+	if [[ -z "$_is_update_required" ]]; then
+		echo "$(tgreen)Installed version is up-to-dated, there is nothing to do.$(treset)"
+		return
+	fi
+	perform_install_udpmod_binary
+	perform_install_udpmod_example_config
+	perform_install_udpmod_home_legacy
+	perform_install_udpmod_systemd
+	setup_ssl
+	start_services
+	if [[ -n "$_is_frash_install" ]]; then
+		D=$(cat $CONFIG_DIR/config.json|grep 'listen\|obfs'|sed 's/"\|,//g'|sed 's/: :/: /'|sed 's/listen/PUERTO/'|sed 's/obfs/OBFS/')
+		echo
+		echo -e "$(tbold)Congratulation! Rufu99-UDP has been successfully installed on your server.$(treset)"
+		echo
+		echo -e "$(tbold)Client app AGN INJECTOR:$(treset)"
+		echo -e "$(tblue)https://play.google.com/store/apps/details?id=com.agn.injector$(treset)"
+		echo
+		echo "$D"
+		echo
+		echo "crear usuario manualmente"
+		echo
+		echo "useradd -M -s /bin/false NOMBRE; (echo 'CONTRA'; echo 'CONTRA')|passwd NOMBRE"
+		echo
+	else
+		restart_running_services
+		
+		echo
+		echo -e "$(tbold)Rufu99-UDP has been successfully update to $VERSION.$(treset)"
+		echo
+	fi
 }
 
 perform_remove() {
@@ -1036,18 +1044,11 @@ main() {
 	check_udpmod_user "udpmod"
 	check_udpmod_homedir "/var/lib/$UDPMOD_USER"
 	case "$OPERATION" in
-	"install")
-	perform_install
-	;;
-	"remove")
-	perform_remove
-	;;
-	"check_update")
-	perform_check_update
-	;;
-	*)
-	error "Unknown operation '$OPERATION'."
-	;;
+			 "install") inicio
+			 						perform_install;;
+				"remove") perform_remove;;
+	"check_update") perform_check_update;;
+							 *) error "Unknown operation '$OPERATION'.";;
 	esac
 }
 
