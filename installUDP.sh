@@ -5,11 +5,6 @@
 # (c) 2023 Khaled AGN
 #
 
-clear
-echo
-read -p ' INGRESA TU DOMINI: ' DOMAIN
-echo
-
 set -e
 
 ###
@@ -842,29 +837,29 @@ perform_install_udpmod_binary() {
 		
 		if install -Dm755 "$LOCAL_FILE" "$EXECUTABLE_INSTALL_PATH"; then
 			echo "ok"
-			else
-				exit 2
-				fi
+		else
+			exit 2
+		fi
 				
-				return
-				fi
+		return
+	fi
 				
-				local _tmpfile=$(mktemp)
+	local _tmpfile=$(mktemp)
 				
-				if ! download_udpmod "$VERSION" "$_tmpfile"; then
-					rm -f "$_tmpfile"
-					exit 11
-					fi
+	if ! download_udpmod "$VERSION" "$_tmpfile"; then
+		rm -f "$_tmpfile"
+		exit 11
+	fi
 					
-					echo -ne "Installing udpmod executable ... "
+	echo -ne "Installing udpmod executable ... "
 					
-					if install -Dm755 "$_tmpfile" "$EXECUTABLE_INSTALL_PATH"; then
-						echo "ok"
-						else
-							exit 13
-							fi
+	if install -Dm755 "$_tmpfile" "$EXECUTABLE_INSTALL_PATH"; then
+		echo "ok"
+	else
+		exit 13
+	fi
 							
-							rm -f "$_tmpfile"
+	rm -f "$_tmpfile"
 }
 
 perform_remove_udpmod_binary() {
@@ -913,7 +908,6 @@ inicio(){
 perform_install() {
 	local _is_frash_install
 	if ! is_udpmod_installed; then
-		inicio
 		_is_frash_install=1
 	fi
 		
@@ -934,6 +928,7 @@ perform_install() {
 		echo "$(tgreen)Installed version is up-to-dated, there is nothing to do.$(treset)"
 		return
 	fi
+	inicio
 	perform_install_udpmod_binary
 	perform_install_udpmod_example_config
 	perform_install_udpmod_home_legacy
@@ -1044,8 +1039,7 @@ main() {
 	check_udpmod_user "udpmod"
 	check_udpmod_homedir "/var/lib/$UDPMOD_USER"
 	case "$OPERATION" in
-			 "install") inicio
-			 						perform_install;;
+			 "install") perform_install;;
 				"remove") perform_remove;;
 	"check_update") perform_check_update;;
 							 *) error "Unknown operation '$OPERATION'.";;
