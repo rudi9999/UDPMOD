@@ -11,4 +11,4 @@ colavoracion de
 
 pide tu apps personalizada a [@Gatesccn](https://t.me/Gatesccn)
 
-# binario demo expiran el 27-07-2023
+# binario demo expiran el 27-08-2023
