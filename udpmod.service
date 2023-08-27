@@ -1,0 +1,20 @@
+[Unit]
+Description=UDPMOD Service BY @Rufu99
+After=network.target
+
+[Service]
+User=root
+Group=root
+ExecStartPost=sysb net.ipv4.ip_forward=1
+ExecStartPost=sysb net.ipv4.conf.all.rp_filter=0
+ExecStartPost=sysb net.ipv4.conf.iptb.rp_filter=0
+ExecStartPost=ip4tbin -t nat -A PREROUTING -i iptb -p udp --dport 10000:65000 -j DNAT --to-destination :36712
+ExecStartPost=ip6tbin -t nat -A PREROUTING -i iptb -p udp --dport 10000:65000 -j DNAT --to-destination :36712
+ExecStopPost=ip4tbin -t nat -D PREROUTING -i iptb -p udp --dport 10000:65000 -j DNAT --to-destination :36712
+ExecStopPost=ip6tbin -t nat -D PREROUTING -i iptb -p udp --dport 10000:65000 -j DNAT --to-destination :36712
+WorkingDirectory=instDir
+Environment="PATH=instDir/UDPMOD"
+ExecStart=instDir/udpmod -config instDir/config.json server
+
+[Install]
+WantedBy=multi-user.target
