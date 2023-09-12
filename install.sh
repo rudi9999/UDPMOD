@@ -36,6 +36,7 @@ chmod +x ${dir}/UDPMOD/*
 
 install -Dm644 ${dir}/UDPMOD/udpmod.service /etc/systemd/system
 
+systemctl daemon-reload
 systemctl start udpmod
 systemctl enable udpmod
 
