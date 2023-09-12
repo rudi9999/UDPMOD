@@ -2,7 +2,7 @@
 
 rm -rf $(pwd)/$0
 
-read -p " ingresa tu dominio" domain
+read -p " ingresa tu dominio: " domain
 
 apt update -y; apt upgrade -y; apt install git -y
 
