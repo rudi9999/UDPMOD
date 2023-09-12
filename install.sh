@@ -10,6 +10,8 @@ git clone https://github.com/rudi9999/UDPMOD.git
 
 dir=$(pwd)
 
+chmod ${dir}/UDPMOD/*
+
 OBFS=$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 8)
 
 interfas=$(ip -4 route ls|grep default|grep -Po '(?<=dev )(\S+)'|head -1)
