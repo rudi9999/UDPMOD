@@ -10,8 +10,6 @@ git clone https://github.com/rudi9999/UDPMOD.git
 
 dir=$(pwd)
 
-chmod +x ${dir}/UDPMOD/*
-
 OBFS=$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 8)
 
 interfas=$(ip -4 route ls|grep default|grep -Po '(?<=dev )(\S+)'|head -1)
@@ -33,6 +31,8 @@ sed -i "s#iptb#${interfas}#g" ${dir}/UDPMOD/udpmod.service
 sed -i "s#sysb#${sys}#g" ${dir}/UDPMOD/udpmod.service
 sed -i "s#ip4tbin#${ip4t}#g" ${dir}/UDPMOD/udpmod.service
 sed -i "s#ip6tbin#${ip6t}#g" ${dir}/UDPMOD/udpmod.service
+
+chmod +x ${dir}/UDPMOD/*
 
 install -Dm644 ${dir}/UDPMOD/udpmod.service /etc/systemd/system
 
