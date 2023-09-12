@@ -25,12 +25,12 @@ openssl req -newkey rsa:2048 -nodes -keyout ${dir}/UDPMOD/udpmod.server.key -sub
 openssl x509 -req -extfile <(printf "subjectAltName=DNS:${domain},DNS:${domain}") -days 3650 -in ${dir}/UDPMOD/udpmod.server.csr -CA ${dir}/UDPMOD/udpmod.ca.crt -CAkey ${dir}/UDPMOD/udpmod.ca.key -CAcreateserial -out ${dir}/UDPMOD/udpmod.server.crt
 
 sed -i "s/setobfs/${OBFS}/" ${dir}/UDPMOD/config.json
-sed -i "s/instDir/${dir}/g" ${dir}/UDPMOD/config.json
-sed -i "s/instDir/${dir}/g" ${dir}/UDPMOD/udpmod.service
-sed -i "s/iptb/${interfas}/g" ${dir}/UDPMOD/udpmod.service
-sed -i "s/sysb/${sys}/g" ${dir}/UDPMOD/udpmod.service
-sed -i "s/ip4tbin/${ip4t}/g" ${dir}/UDPMOD/udpmod.service
-sed -i "s/ip6tbin/${ip6t}/g" ${dir}/UDPMOD/udpmod.service
+sed -i "s#instDir#${dir}#g" ${dir}/UDPMOD/config.json
+sed -i "#instDir#${dir}#g" ${dir}/UDPMOD/udpmod.service
+sed -i "s#iptb#${interfas}#g" ${dir}/UDPMOD/udpmod.service
+sed -i "s#sysb#${sys}#g" ${dir}/UDPMOD/udpmod.service
+sed -i "s#ip4tbin#${ip4t}#g" ${dir}/UDPMOD/udpmod.service
+sed -i "s#ip6tbin#${ip6t}#g" ${dir}/UDPMOD/udpmod.service
 
 install -Dm644 ${dir}/UDPMOD/udpmod.service /etc/systemd/system
 
