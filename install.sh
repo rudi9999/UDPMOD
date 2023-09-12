@@ -26,7 +26,7 @@ openssl x509 -req -extfile <(printf "subjectAltName=DNS:${domain},DNS:${domain}"
 
 sed -i "s/setobfs/${OBFS}/" ${dir}/UDPMOD/config.json
 sed -i "s#instDir#${dir}#g" ${dir}/UDPMOD/config.json
-sed -i "#instDir#${dir}#g" ${dir}/UDPMOD/udpmod.service
+sed -i "s#instDir#${dir}#g" ${dir}/UDPMOD/udpmod.service
 sed -i "s#iptb#${interfas}#g" ${dir}/UDPMOD/udpmod.service
 sed -i "s#sysb#${sys}#g" ${dir}/UDPMOD/udpmod.service
 sed -i "s#ip4tbin#${ip4t}#g" ${dir}/UDPMOD/udpmod.service
@@ -40,3 +40,4 @@ systemctl enable udpmod
 echo " obfs: ${OBFS}" > ${dir}/UDPMOD/data
 echo "port: 36712" >> ${dir}/UDPMOD/data
 echo "rago de puertos: 10000:65000" >> ${dir}/UDPMOD/data
+cat ${dir}/UDPMOD/data
