@@ -14,7 +14,7 @@ ExecStopPost=ip4tbin -t nat -D PREROUTING -i iptb -p udp --dport 10000:65000 -j 
 ExecStopPost=ip6tbin -t nat -D PREROUTING -i iptb -p udp --dport 10000:65000 -j DNAT --to-destination :36712
 WorkingDirectory=instDir
 Environment="PATH=instDir/UDPMOD"
-ExecStart=instDir/UDPMOD -config instDir/UDPMOD/config.json server
+ExecStart=instDir/UDPMOD/hysteria-linux-amd64 -config instDir/UDPMOD/config.json server
 
 [Install]
 WantedBy=multi-user.target
