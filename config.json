@@ -1,7 +1,7 @@
 {
    "listen": ":36712",
 	"cert": "instDir/UDPMOD/udpmod.server.crt",
-	"key": "instDir/UPDMOD/udpmod.server.key",
+	"key": "instDir/UDPMOD/udpmod.server.key",
 	"protocol": "udp",
 	"up": "100 Mbps",
 	"up_mbps": 100,
