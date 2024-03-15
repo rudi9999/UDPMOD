@@ -11,4 +11,4 @@ colavoracion de
 
 pide tu apps personalizada a [@Gatesccn](https://t.me/Gatesccn)
 
-# binario autSSH demo expiran el 15-03-2024
+# binario autSSH demo expiran el 15-06-2024
